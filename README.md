@@ -64,10 +64,6 @@ git clone https://github.com/yourusername/AssetFlow.git
 - Export Reports (PDF/Excel)
 - Email Notifications
 
-## License
-
-This project is licensed under the MIT License.
-
 ## Author
 
 **Ashish Suthar**  
