@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AssetFlow – Enterprise Asset Management</title>
+  <meta name="description" content="AssetFlow is a modern enterprise asset management platform for tracking, allocating, booking, and maintaining company assets." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Login Screen -->
+    <div id="screen-login" class="screen active" style="position: relative;">
+      <!-- Theme Toggle on Login Page -->
+      <button class="user-action-btn" id="login-theme-toggle" onclick="App.cycleTheme()" title="Toggle Theme" style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 8px; border-radius: 8px; cursor: pointer; color: var(--text-primary);">
+        <svg id="login-theme-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+      </button>
+
+      <div class="login-wrapper">
+        <div class="login-card">
+          <div class="login-header">
+            <h1 class="login-title">AssetFlow – login</h1>
+          </div>
+          <div class="login-body">
+            <div class="login-logo">
+              <span>AF</span>
+            </div>
+            <div class="form-group">
+              <label for="login-email">Email</label>
+              <input type="email" id="login-email" placeholder="name@company.com" />
+            </div>
+            <div class="form-group">
+              <label for="login-password">Password</label>
+              <div style="position: relative;">
+                <input type="password" id="login-password" placeholder="Enter password" style="padding-right: 40px; width: 100%; box-sizing: border-box;" />
+                <button type="button" onclick="App.togglePassword()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 0; display: flex;">
+                  <svg id="eye-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
+              <div class="forgot-password"><a href="#" onclick="App.openChangePasswordModal(); return false;">Change password</a></div>
+            </div>
+            <div class="divider"></div>
+            <div class="signup-section" style="margin-bottom: 0;">
+              <p class="new-here">New here?</p>
+              <div class="signup-info">
+                <p>Sign up creates an employee account<br />admin roles assigned later</p>
+              </div>
+              <button id="btn-create-account" class="btn btn-outline btn-full" onclick="App.openSignupModal()" style="margin-bottom: 0;">Create Account</button>
+            </div>
+            <button class="btn btn-primary btn-full" style="margin-top: 4px;" onclick="App.login()">Sign In</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main App Layout -->
+    <div id="screen-main" class="screen">
+      <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+          <div class="sidebar-brand">
+            <span class="brand-name">AssetFlow</span>
+          </div>
+          <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-page="dashboard" onclick="App.navigate('dashboard', this)">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              Dashboard
+            </a>
+            <a href="#" class="nav-item" data-page="org-setup" onclick="App.navigate('org-setup', this)">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              Organization setup
+            </a>
+            <a href="#" class="nav-item" data-page="assets" onclick="App.navigate('assets', this)">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+              Assets
+            </a>
+            <a href="#" class="nav-item" data-page="allocation" onclick="App.navigate('allocation', this)">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
+              Allocation & Transfer
+            </a>
+            <a href="#" class="nav-item" data-page="booking" onclick="App.navigate('booking', this)">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Resource Booking
+            </a>
+            <a href="#" class="nav-item" data-page="maintenance" onclick="App.navigate('maintenance', this)">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+              Maintenance
+            </a>
+            <a href="#" class="nav-item" data-page="audit" onclick="App.navigate('audit', this)">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+              Audit
+            </a>
+            <a href="#" class="nav-item" data-page="reports" onclick="App.navigate('reports', this)">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              Reports
+            </a>
+            <a href="#" class="nav-item" data-page="notifications" onclick="App.navigate('notifications', this)">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+              Notifications
+              <span class="badge">3</span>
+            </a>
+          </nav>
+          <div class="sidebar-footer">
+            <div class="user-avatar">JD</div>
+            <div class="user-info">
+              <span class="user-name">John Doe</span>
+              <span class="user-role">Admin</span>
+            </div>
+            <div style="display: flex; gap: 4px;">
+              <button class="logout-btn" id="theme-toggle" onclick="App.cycleTheme()" title="Toggle Theme (System/Light/Dark)">
+                <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+              </button>
+              <button class="logout-btn" onclick="App.logout()" title="Switch Account">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-8 0v2"/><circle cx="12" cy="7" r="4"/><path d="M21 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+              </button>
+              <button class="logout-btn" onclick="App.logout()" title="Logout">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+          <!-- Dashboard Page -->
+          <div id="page-dashboard" class="page active">
+            <div class="page-header">
+              <h2 class="page-title">Today's Overview</h2>
+              <div class="page-header-actions">
+                <span class="date-badge" id="current-date"></span>
+              </div>
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-label">Available</div>
+                <div class="stat-value" id="dash-stat-available">128</div>
+                <div class="stat-sub">Assets ready to allocate</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Allocated</div>
+                <div class="stat-value accent-blue" id="dash-stat-allocated">76</div>
+                <div class="stat-sub">Currently assigned</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Available</div>
+                <div class="stat-value accent-purple">4</div>
+                <div class="stat-sub">Bookable resources</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Active Bookings</div>
+                <div class="stat-value accent-teal">9</div>
+                <div class="stat-sub">Rooms & resources</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Pending Transfers</div>
+                <div class="stat-value accent-amber">3</div>
+                <div class="stat-sub">Awaiting approval</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Upcoming Returns</div>
+                <div class="stat-value accent-orange">12</div>
+                <div class="stat-sub">Due this week</div>
+              </div>
+            </div>
+
+            <div class="alert-banner alert-danger">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              3 assets overdue for return – flagged for follow-up
+            </div>
+
+            <div class="quick-actions">
+              <button class="btn btn-primary" onclick="App.navigate('assets', document.querySelector('[data-page=assets]'))">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Register Asset
+              </button>
+              <button class="btn btn-outline" onclick="App.navigate('booking', document.querySelector('[data-page=booking]'))">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Book Resource
+              </button>
+              <button class="btn btn-outline" onclick="App.navigate('allocation', document.querySelector('[data-page=allocation]'))">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/></svg>
+                Raise Requests
+              </button>
+            </div>
+
+            <div class="section-card mt-lg">
+              <h3 class="section-title">Recent Activity</h3>
+              <div class="activity-list">
+                <div class="activity-item">
+                  <div class="activity-dot dot-blue"></div>
+                  <div class="activity-content">
+                    <span class="activity-text">Laptop <strong>AF-0114</strong> – allocated to Priya Shah – IT dept</span>
+                    <span class="activity-time">2 hours ago</span>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-dot dot-green"></div>
+                  <div class="activity-content">
+                    <span class="activity-text">Room <strong>B2</strong> – booking confirmed – 2:00 to 3:00 PM</span>
+                    <span class="activity-time">3 hours ago</span>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-dot dot-teal"></div>
+                  <div class="activity-content">
+                    <span class="activity-text">Projector <strong>AF-0062</strong> – maintenance resolved</span>
+                    <span class="activity-time">5 hours ago</span>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-dot dot-amber"></div>
+                  <div class="activity-content">
+                    <span class="activity-text">Office Chair <strong>AF-0201</strong> – returned to warehouse</span>
+                    <span class="activity-time">Yesterday</span>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-dot dot-red"></div>
+                  <div class="activity-content">
+                    <span class="activity-text">Forklift <strong>AF-0078</strong> – maintenance ticket raised</span>
+                    <span class="activity-time">Yesterday</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Organization Setup Page -->
+          <div id="page-org-setup" class="page">
+            <div class="page-header">
+              <h2 class="page-title">Organization Setup</h2>
+              <span class="admin-badge">Admin Only</span>
+            </div>
+
+            <div class="tab-bar">
+              <button class="tab-btn active" onclick="OrgSetup.switchTab('departments', this)" id="tab-departments">Departments</button>
+              <button class="tab-btn" onclick="OrgSetup.switchTab('categories', this)" id="tab-categories">Categories</button>
+              <button class="tab-btn" onclick="OrgSetup.switchTab('employees', this)" id="tab-employees">Employee</button>
+              <button class="btn btn-primary ml-auto" onclick="OrgSetup.openAddModal()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add
+              </button>
+            </div>
+
+            <div id="tab-content-departments" class="tab-content active">
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Department</th>
+                      <th>Head</th>
+                      <th>Parent Dept</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dept-table-body">
+                    <tr>
+                      <td>Engineering</td>
+                      <td>Aditi Rao</td>
+                      <td>–</td>
+                      <td><span class="status-badge status-active">Active</span></td>
+                      <td>
+                        <button class="action-btn" onclick="OrgSetup.editDept('Engineering')">Edit</button>
+                        <button class="action-btn action-btn-danger" onclick="OrgSetup.deleteDept(this)">Delete</button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Facilities</td>
+                      <td>Rohan Mehta</td>
+                      <td>–</td>
+                      <td><span class="status-badge status-active">Active</span></td>
+                      <td>
+                        <button class="action-btn" onclick="OrgSetup.editDept('Facilities')">Edit</button>
+                        <button class="action-btn action-btn-danger" onclick="OrgSetup.deleteDept(this)">Delete</button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Field Ops (East)</td>
+                      <td>Sona Iqbal</td>
+                      <td>Field Ops</td>
+                      <td><span class="status-badge status-inactive">Inactive</span></td>
+                      <td>
+                        <button class="action-btn" onclick="OrgSetup.editDept('Field Ops (East)')">Edit</button>
+                        <button class="action-btn action-btn-danger" onclick="OrgSetup.deleteDept(this)">Delete</button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>IT</td>
+                      <td>Priya Shah</td>
+                      <td>Engineering</td>
+                      <td><span class="status-badge status-active">Active</span></td>
+                      <td>
+                        <button class="action-btn" onclick="OrgSetup.editDept('IT')">Edit</button>
+                        <button class="action-btn action-btn-danger" onclick="OrgSetup.deleteDept(this)">Delete</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="info-text mt-md">Editing a department here also drives the picklist in Asset Allocation & Transfer screens.</p>
+            </div>
+
+            <div id="tab-content-categories" class="tab-content">
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Category</th>
+                      <th>Asset Count</th>
+                      <th>Description</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tab-categories-body">
+                    <tr>
+                      <td>Electronics</td>
+                      <td>54</td>
+                      <td>Laptops, projectors, monitors</td>
+                      <td>
+                        <button class="action-btn" onclick="OrgSetup.editCategory('Electronics')">Edit</button>
+                        <button class="action-btn action-btn-danger" onclick="OrgSetup.deleteCategory(this)">Delete</button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Furniture</td>
+                      <td>32</td>
+                      <td>Chairs, desks, cabinets</td>
+                      <td>
+                        <button class="action-btn" onclick="OrgSetup.editCategory('Furniture')">Edit</button>
+                        <button class="action-btn action-btn-danger" onclick="OrgSetup.deleteCategory(this)">Delete</button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Vehicles</td>
+                      <td>8</td>
+                      <td>Forklifts, vans</td>
+                      <td>
+                        <button class="action-btn" onclick="OrgSetup.editCategory('Vehicles')">Edit</button>
+                        <button class="action-btn action-btn-danger" onclick="OrgSetup.deleteCategory(this)">Delete</button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Office Supplies</td>
+                      <td>140</td>
+                      <td>Stationery, small tools</td>
+                      <td>
+                        <button class="action-btn" onclick="OrgSetup.editCategory('Office Supplies')">Edit</button>
+                        <button class="action-btn action-btn-danger" onclick="OrgSetup.deleteCategory(this)">Delete</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div id="tab-content-employees" class="tab-content">
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Department</th>
+                      <th>Role</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Priya Shah</td>
+                      <td>priya@company.com</td>
+                      <td>IT / Engineering</td>
+                      <td><span class="status-badge status-active">Admin</span></td>
+                      <td>
+                        <button class="action-btn" onclick="OrgSetup.editEmployee('Priya Shah')">Edit</button>
+                        <button class="action-btn action-btn-danger" onclick="OrgSetup.deleteEmployee(this)">Remove</button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Arjun Nair</td>
+                      <td>arjun@company.com</td>
+                      <td>Facilities</td>
+                      <td><span class="status-badge status-inactive">Employee</span></td>
+                      <td>
+                        <button class="action-btn" onclick="OrgSetup.editEmployee('Arjun Nair')">Edit</button>
+                        <button class="action-btn action-btn-danger" onclick="OrgSetup.deleteEmployee(this)">Remove</button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Sona Iqbal</td>
+                      <td>sona@company.com</td>
+                      <td>Field Ops</td>
+                      <td><span class="status-badge status-inactive">Employee</span></td>
+                      <td>
+                        <button class="action-btn" onclick="OrgSetup.editEmployee('Sona Iqbal')">Edit</button>
+                        <button class="action-btn action-btn-danger" onclick="OrgSetup.deleteEmployee(this)">Remove</button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Rohan Mehta</td>
+                      <td>rohan@company.com</td>
+                      <td>IT</td>
+                      <td><span class="status-badge status-active">Admin</span></td>
+                      <td>
+                        <button class="action-btn" onclick="OrgSetup.editEmployee('Rohan Mehta')">Edit</button>
+                        <button class="action-btn action-btn-danger" onclick="OrgSetup.deleteEmployee(this)">Remove</button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Sarah Chen</td>
+                      <td>sarah@company.com</td>
+                      <td>HR</td>
+                      <td><span class="status-badge status-active">Admin</span></td>
+                      <td>
+                        <button class="action-btn" onclick="OrgSetup.editEmployee('Sarah Chen')">Edit</button>
+                        <button class="action-btn action-btn-danger" onclick="OrgSetup.deleteEmployee(this)">Remove</button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Vikram Singh</td>
+                      <td>vikram@company.com</td>
+                      <td>Engineering</td>
+                      <td><span class="status-badge status-inactive">Employee</span></td>
+                      <td>
+                        <button class="action-btn" onclick="OrgSetup.editEmployee('Vikram Singh')">Edit</button>
+                        <button class="action-btn action-btn-danger" onclick="OrgSetup.deleteEmployee(this)">Remove</button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Anita Desai</td>
+                      <td>anita@company.com</td>
+                      <td>Finance</td>
+                      <td><span class="status-badge status-inactive">Employee</span></td>
+                      <td>
+                        <button class="action-btn" onclick="OrgSetup.editEmployee('Anita Desai')">Edit</button>
+                        <button class="action-btn action-btn-danger" onclick="OrgSetup.deleteEmployee(this)">Remove</button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Liam O'Connor</td>
+                      <td>liam@company.com</td>
+                      <td>Field Ops</td>
+                      <td><span class="status-badge status-inactive">Employee</span></td>
+                      <td>
+                        <button class="action-btn" onclick="OrgSetup.editEmployee(&quot;Liam O'Connor&quot;)">Edit</button>
+                        <button class="action-btn action-btn-danger" onclick="OrgSetup.deleteEmployee(this)">Remove</button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Maya Patel</td>
+                      <td>maya@company.com</td>
+                      <td>Marketing</td>
+                      <td><span class="status-badge status-inactive">Employee</span></td>
+                      <td>
+                        <button class="action-btn" onclick="OrgSetup.editEmployee('Maya Patel')">Edit</button>
+                        <button class="action-btn action-btn-danger" onclick="OrgSetup.deleteEmployee(this)">Remove</button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>David Kim</td>
+                      <td>david@company.com</td>
+                      <td>Facilities</td>
+                      <td><span class="status-badge status-inactive">Employee</span></td>
+                      <td>
+                        <button class="action-btn" onclick="OrgSetup.editEmployee('David Kim')">Edit</button>
+                        <button class="action-btn action-btn-danger" onclick="OrgSetup.deleteEmployee(this)">Remove</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Assets Page -->
+          <div id="page-assets" class="page">
+            <div class="page-header">
+              <h2 class="page-title">Assets</h2>
+              <button class="btn btn-primary" onclick="Assets.openRegisterModal()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Register Asset
+              </button>
+            </div>
+
+            <div class="filter-bar">
+              <div class="search-box">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="asset-search" placeholder="Search by tag, serial, or QR code..." oninput="Assets.search(this.value)" />
+              </div>
+              <div class="filter-group">
+                <select class="filter-select" onchange="Assets.filter()" id="asset-filter-category">
+                  <option value="">Category</option>
+                  <option>Electronics</option>
+                  <option>Furniture</option>
+                  <option>Vehicles</option>
+                  <option>Office Supplies</option>
+                </select>
+                <select class="filter-select" onchange="Assets.filter()" id="asset-filter-status">
+                  <option value="">Status</option>
+                  <option>Available</option>
+                  <option>Allocated</option>
+                  <option>Maintenance</option>
+                  <option>Retired</option>
+                </select>
+                <select class="filter-select" onchange="Assets.filter()" id="asset-filter-dept">
+                  <option value="">Department</option>
+                  <option>Engineering</option>
+                  <option>IT</option>
+                  <option>Facilities</option>
+                  <option>Field Ops</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="table-container">
+              <table class="data-table" id="assets-table">
+                <thead>
+                  <tr>
+                    <th>Tag</th>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Location</th>
+                    <th>Assigned To</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="assets-table-body">
+                  <tr data-category="Electronics" data-status="Allocated" data-dept="IT">
+                    <td><span class="tag-badge">AF-0012</span></td>
+                    <td>Dell Laptop</td>
+                    <td>Electronics</td>
+                    <td><span class="status-badge status-allocated">Allocated</span></td>
+                    <td>Bengaluru</td>
+                    <td>Priya Shah</td>
+                    <td>
+                      <button class="action-btn" onclick="Assets.viewAsset('AF-0012')">View</button>
+                      <button class="action-btn" onclick="Assets.allocateAsset('AF-0012')">Allocate</button>
+                      <button class="action-btn" onclick="Assets.unallocateAsset('AF-0012')">Unallocate</button>
+                    </td>
+                  </tr>
+                  <tr data-category="Electronics" data-status="Maintenance" data-dept="Facilities">
+                    <td><span class="tag-badge">AF-0062</span></td>
+                    <td>Projector</td>
+                    <td>Electronics</td>
+                    <td><span class="status-badge status-maintenance">Maintenance</span></td>
+                    <td>HQ Floor 2</td>
+                    <td>–</td>
+                    <td>
+                      <button class="action-btn" onclick="Assets.viewAsset('AF-0062')">View</button>
+                      <button class="action-btn" onclick="Assets.allocateAsset('AF-0062')">Allocate</button>
+                      <button class="action-btn" onclick="Assets.unallocateAsset('AF-0062')">Unallocate</button>
+                    </td>
+                  </tr>
+                  <tr data-category="Furniture" data-status="Available" data-dept="">
+                    <td><span class="tag-badge">AF-0201</span></td>
+                    <td>Office Chair</td>
+                    <td>Furniture</td>
+                    <td><span class="status-badge status-available">Available</span></td>
+                    <td>Warehouse</td>
+                    <td>–</td>
+                    <td>
+                      <button class="action-btn" onclick="Assets.viewAsset('AF-0201')">View</button>
+                      <button class="action-btn" onclick="Assets.allocateAsset('AF-0201')">Allocate</button>
+                      <button class="action-btn" onclick="Assets.unallocateAsset('AF-0201')">Unallocate</button>
+                    </td>
+                  </tr>
+                  <tr data-category="Vehicles" data-status="Maintenance" data-dept="Field Ops">
+                    <td><span class="tag-badge">AF-0078</span></td>
+                    <td>Forklift</td>
+                    <td>Vehicles</td>
+                    <td><span class="status-badge status-maintenance">Maintenance</span></td>
+                    <td>Warehouse B</td>
+                    <td>–</td>
+                    <td>
+                      <button class="action-btn" onclick="Assets.viewAsset('AF-0078')">View</button>
+                      <button class="action-btn" onclick="Assets.allocateAsset('AF-0078')">Allocate</button>
+                      <button class="action-btn" onclick="Assets.unallocateAsset('AF-0078')">Unallocate</button>
+                    </td>
+                  </tr>
+                  <tr data-category="Electronics" data-status="Available" data-dept="">
+                    <td><span class="tag-badge">AF-0114</span></td>
+                    <td>Dell Laptop</td>
+                    <td>Electronics</td>
+                    <td><span class="status-badge status-available">Available</span></td>
+                    <td>IT Store</td>
+                    <td>–</td>
+                    <td>
+                      <button class="action-btn" onclick="Assets.viewAsset('AF-0114')">View</button>
+                      <button class="action-btn" onclick="Assets.allocateAsset('AF-0114')">Allocate</button>
+                      <button class="action-btn" onclick="Assets.unallocateAsset('AF-0114')">Unallocate</button>
+                    </td>
+                  </tr>
+                  <tr data-category="Electronics" data-status="Available" data-dept="">
+                    <td><span class="tag-badge">AF-0003</span></td>
+                    <td>AC Unit</td>
+                    <td>Electronics</td>
+                    <td><span class="status-badge status-available">Available</span></td>
+                    <td>HQ Floor 1</td>
+                    <td>–</td>
+                    <td>
+                      <button class="action-btn" onclick="Assets.viewAsset('AF-0003')">View</button>
+                      <button class="action-btn" onclick="Assets.allocateAsset('AF-0003')">Allocate</button>
+                      <button class="action-btn" onclick="Assets.unallocateAsset('AF-0003')">Unallocate</button>
+                    </td>
+                  </tr>
+                  <tr data-category="Electronics" data-status="Allocated" data-dept="IT">
+                    <td><span class="tag-badge">AF-0020</span></td>
+                    <td>MacBook Pro</td>
+                    <td>Electronics</td>
+                    <td><span class="status-badge status-allocated">Allocated</span></td>
+                    <td>Mumbai</td>
+                    <td>Rohan Mehta</td>
+                    <td>
+                      <button class="action-btn" onclick="Assets.viewAsset('AF-0020')">View</button>
+                      <button class="action-btn" onclick="Assets.allocateAsset('AF-0020')">Allocate</button>
+                      <button class="action-btn" onclick="Assets.unallocateAsset('AF-0020')">Unallocate</button>
+                    </td>
+                  </tr>
+                  <tr data-category="Furniture" data-status="Available" data-dept="">
+                    <td><span class="tag-badge">AF-0044</span></td>
+                    <td>Conference Table</td>
+                    <td>Furniture</td>
+                    <td><span class="status-badge status-available">Available</span></td>
+                    <td>HQ Floor 3</td>
+                    <td>–</td>
+                    <td>
+                      <button class="action-btn" onclick="Assets.viewAsset('AF-0044')">View</button>
+                      <button class="action-btn" onclick="Assets.allocateAsset('AF-0044')">Allocate</button>
+                      <button class="action-btn" onclick="Assets.unallocateAsset('AF-0044')">Unallocate</button>
+                    </td>
+                  </tr>
+                  <tr data-category="Office Supplies" data-status="Allocated" data-dept="Engineering">
+                    <td><span class="tag-badge">AF-0055</span></td>
+                    <td>Whiteboard</td>
+                    <td>Office Supplies</td>
+                    <td><span class="status-badge status-allocated">Allocated</span></td>
+                    <td>Bengaluru</td>
+                    <td>Vikram Singh</td>
+                    <td>
+                      <button class="action-btn" onclick="Assets.viewAsset('AF-0055')">View</button>
+                      <button class="action-btn" onclick="Assets.allocateAsset('AF-0055')">Allocate</button>
+                      <button class="action-btn" onclick="Assets.unallocateAsset('AF-0055')">Unallocate</button>
+                    </td>
+                  </tr>
+                  <tr data-category="Furniture" data-status="Allocated" data-dept="HR">
+                    <td><span class="tag-badge">AF-0088</span></td>
+                    <td>Standing Desk</td>
+                    <td>Furniture</td>
+                    <td><span class="status-badge status-allocated">Allocated</span></td>
+                    <td>Mumbai</td>
+                    <td>Sarah Chen</td>
+                    <td>
+                      <button class="action-btn" onclick="Assets.viewAsset('AF-0088')">View</button>
+                      <button class="action-btn" onclick="Assets.allocateAsset('AF-0088')">Allocate</button>
+                      <button class="action-btn" onclick="Assets.unallocateAsset('AF-0088')">Unallocate</button>
+                    </td>
+                  </tr>
+                  <tr data-category="Electronics" data-status="Available" data-dept="">
+                    <td><span class="tag-badge">AF-0091</span></td>
+                    <td>Dell Monitor</td>
+                    <td>Electronics</td>
+                    <td><span class="status-badge status-available">Available</span></td>
+                    <td>IT Store</td>
+                    <td>–</td>
+                    <td>
+                      <button class="action-btn" onclick="Assets.viewAsset('AF-0091')">View</button>
+                      <button class="action-btn" onclick="Assets.allocateAsset('AF-0091')">Allocate</button>
+                      <button class="action-btn" onclick="Assets.unallocateAsset('AF-0091')">Unallocate</button>
+                    </td>
+                  </tr>
+                  <tr data-category="Electronics" data-status="Allocated" data-dept="Field Ops">
+                    <td><span class="tag-badge">AF-0120</span></td>
+                    <td>iPhone 14</td>
+                    <td>Electronics</td>
+                    <td><span class="status-badge status-allocated">Allocated</span></td>
+                    <td>Field Ops Hub</td>
+                    <td>Sona Iqbal</td>
+                    <td>
+                      <button class="action-btn" onclick="Assets.viewAsset('AF-0120')">View</button>
+                      <button class="action-btn" onclick="Assets.allocateAsset('AF-0120')">Allocate</button>
+                      <button class="action-btn" onclick="Assets.unallocateAsset('AF-0120')">Unallocate</button>
+                    </td>
+                  </tr>
+                  <tr data-category="Vehicles" data-status="Available" data-dept="">
+                    <td><span class="tag-badge">AF-0145</span></td>
+                    <td>Ford Transit</td>
+                    <td>Vehicles</td>
+                    <td><span class="status-badge status-available">Available</span></td>
+                    <td>Warehouse</td>
+                    <td>–</td>
+                    <td>
+                      <button class="action-btn" onclick="Assets.viewAsset('AF-0145')">View</button>
+                      <button class="action-btn" onclick="Assets.allocateAsset('AF-0145')">Allocate</button>
+                      <button class="action-btn" onclick="Assets.unallocateAsset('AF-0145')">Unallocate</button>
+                    </td>
+                  </tr>
+                  <tr data-category="Electronics" data-status="Maintenance" data-dept="Engineering">
+                    <td><span class="tag-badge">AF-0155</span></td>
+                    <td>3D Printer</td>
+                    <td>Electronics</td>
+                    <td><span class="status-badge status-maintenance">Maintenance</span></td>
+                    <td>R&D Lab</td>
+                    <td>–</td>
+                    <td>
+                      <button class="action-btn" onclick="Assets.viewAsset('AF-0155')">View</button>
+                      <button class="action-btn" onclick="Assets.allocateAsset('AF-0155')">Allocate</button>
+                      <button class="action-btn" onclick="Assets.unallocateAsset('AF-0155')">Unallocate</button>
+                    </td>
+                  </tr>
+                  <tr data-category="Furniture" data-status="Allocated" data-dept="Finance">
+                    <td><span class="tag-badge">AF-0182</span></td>
+                    <td>Ergonomic Chair</td>
+                    <td>Furniture</td>
+                    <td><span class="status-badge status-allocated">Allocated</span></td>
+                    <td>Mumbai</td>
+                    <td>Anita Desai</td>
+                    <td>
+                      <button class="action-btn" onclick="Assets.viewAsset('AF-0182')">View</button>
+                      <button class="action-btn" onclick="Assets.allocateAsset('AF-0182')">Allocate</button>
+                      <button class="action-btn" onclick="Assets.unallocateAsset('AF-0182')">Unallocate</button>
+                    </td>
+                  </tr>
+                  <tr data-category="Vehicles" data-status="Allocated" data-dept="Facilities">
+                    <td><span class="tag-badge">AF-0220</span></td>
+                    <td>Forklift</td>
+                    <td>Vehicles</td>
+                    <td><span class="status-badge status-allocated">Allocated</span></td>
+                    <td>Warehouse</td>
+                    <td>David Kim</td>
+                    <td>
+                      <button class="action-btn" onclick="Assets.viewAsset('AF-0220')">View</button>
+                      <button class="action-btn" onclick="Assets.allocateAsset('AF-0220')">Allocate</button>
+                      <button class="action-btn" onclick="Assets.unallocateAsset('AF-0220')">Unallocate</button>
+                    </td>
+                  </tr>
+                  <tr data-category="Electronics" data-status="Allocated" data-dept="Marketing">
+                    <td><span class="tag-badge">AF-0240</span></td>
+                    <td>Projector</td>
+                    <td>Electronics</td>
+                    <td><span class="status-badge status-allocated">Allocated</span></td>
+                    <td>Marketing Hub</td>
+                    <td>Maya Patel</td>
+                    <td>
+                      <button class="action-btn" onclick="Assets.viewAsset('AF-0240')">View</button>
+                      <button class="action-btn" onclick="Assets.allocateAsset('AF-0240')">Allocate</button>
+                      <button class="action-btn" onclick="Assets.unallocateAsset('AF-0240')">Unallocate</button>
+                    </td>
+                  </tr>
+                  <tr data-category="Office Supplies" data-status="Available" data-dept="">
+                    <td><span class="tag-badge">AF-0311</span></td>
+                    <td>Label Maker</td>
+                    <td>Office Supplies</td>
+                    <td><span class="status-badge status-available">Available</span></td>
+                    <td>Warehouse</td>
+                    <td>–</td>
+                    <td>
+                      <button class="action-btn" onclick="Assets.viewAsset('AF-0311')">View</button>
+                      <button class="action-btn" onclick="Assets.allocateAsset('AF-0311')">Allocate</button>
+                      <button class="action-btn" onclick="Assets.unallocateAsset('AF-0311')">Unallocate</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Allocation & Transfer Page -->
+          <div id="page-allocation" class="page">
+            <div class="page-header">
+              <h2 class="page-title">Allocation & Transfer</h2>
+            </div>
+
+            <div class="allocation-form section-card">
+              <div class="form-group">
+                <label>Asset</label>
+                <div class="asset-selector-wrapper">
+                  <select class="form-input" id="alloc-asset-select" onchange="Allocation.checkAsset(this.value)">
+                    <option value="">Select asset...</option>
+                    <option value="AF-0114-free">AF-0114 – Dell Laptop (Available)</option>
+                    <option value="AF-0012-allocated">AF-0012 – Dell Laptop (Allocated to Priya Shah)</option>
+                    <option value="AF-0201-free">AF-0201 – Office Chair (Available)</option>
+                    <option value="AF-0062-maintenance">AF-0062 – Projector (Maintenance)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div id="allocation-warning" class="alert-banner alert-danger" style="display:none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <div>
+                  <strong>Already Allocated to Priya Shah (Engineering)</strong><br />
+                  Direct re-allocation is blocked – submit a transfer request below
+                </div>
+              </div>
+
+              <div id="direct-allocation-form">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Assign To</label>
+                    <select class="form-input" id="alloc-employee">
+                      <option value="">Select Employee...</option>
+                      <option>Priya Shah – IT</option>
+                      <option>Arjun Nair – Facilities</option>
+                      <option>Sona Iqbal – Field Ops</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Location</label>
+                    <select class="form-input" id="alloc-location">
+                      <option value="">Select Location...</option>
+                      <option>Bengaluru HQ</option>
+                      <option>HQ Floor 1</option>
+                      <option>HQ Floor 2</option>
+                      <option>Warehouse</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group mt-md">
+                  <label>Expected Return Date</label>
+                  <input type="date" class="form-input" />
+                </div>
+                <button class="btn btn-primary mt-md" onclick="Allocation.submitAllocation()">Allocate Asset</button>
+              </div>
+
+              <div id="transfer-request-form" style="display:none;">
+                <h3 class="section-subtitle">Transfer Request</h3>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>From</label>
+                    <input type="text" class="form-input" value="Priya Shah" readonly />
+                  </div>
+                  <div class="form-group">
+                    <label>To</label>
+                    <select class="form-input" id="transfer-to">
+                      <option value="">Select Employee...</option>
+                      <option>Arjun Nair – Facilities</option>
+                      <option>Sona Iqbal – Field Ops</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group mt-md">
+                  <label>Reason</label>
+                  <textarea class="form-input form-textarea" id="transfer-reason" placeholder="Explain why this transfer is needed..."></textarea>
+                </div>
+                <button class="btn btn-primary mt-md" onclick="Allocation.submitTransfer()">Submit Request</button>
+              </div>
+            </div>
+
+            <div class="section-card mt-md">
+              <h3 class="section-title">Allocation History</h3>
+              <div class="divider"></div>
+              <div class="history-list">
+                <div class="history-item">
+                  <div class="history-date">Mar 12</div>
+                  <div class="history-desc">Allocated to Priya Shah – Engineering</div>
+                </div>
+                <div class="history-item">
+                  <div class="history-date">Jan 04</div>
+                  <div class="history-desc">Returned by Arjun Nair – condition: good</div>
+                </div>
+                <div class="history-item">
+                  <div class="history-date">Nov 15</div>
+                  <div class="history-desc">Allocated to Arjun Nair – Facilities</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Resource Booking Page -->
+          <div id="page-booking" class="page">
+            <div class="page-header">
+              <h2 class="page-title">Resource Booking</h2>
+              <button class="btn btn-primary" onclick="Booking.openBookModal()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Book a Slot
+              </button>
+            </div>
+
+            <div class="section-card">
+              <div class="form-group">
+                <label>Resource</label>
+                <select class="form-input" id="booking-resource" onchange="Booking.loadTimeline(this.value)">
+                  <option value="b2">Conference Room B2 – Tue, 7 Jul</option>
+                  <option value="lab1">Lab A – Mon, 7 Jul</option>
+                  <option value="proj1">Projector AF-0062 – Tue, 7 Jul</option>
+                </select>
+              </div>
+
+              <div class="timeline-container" id="booking-timeline">
+                <div class="timeline-header">
+                  <div class="timeline-label">Time</div>
+                  <div class="timeline-slots">Availability</div>
+                </div>
+                <div class="timeline-row">
+                  <div class="time-marker">9:00</div>
+                  <div class="slot-area">
+                    <div class="booking-block booked">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                      Booked – Procurement Team – 9:00 to 10:00
+                    </div>
+                  </div>
+                </div>
+                <div class="timeline-row">
+                  <div class="time-marker">10:00</div>
+                  <div class="slot-area">
+                    <div class="booking-block conflict">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                      Requested 9:30 to 10:30 – conflict – slot is unavailable
+                    </div>
+                  </div>
+                </div>
+                <div class="timeline-row">
+                  <div class="time-marker">11:00</div>
+                  <div class="slot-area">
+                    <div class="booking-block available-slot" onclick="Booking.selectSlot(this, '11:00', '12:00')">
+                      Click to book 11:00 – 12:00
+                    </div>
+                  </div>
+                </div>
+                <div class="timeline-row">
+                  <div class="time-marker">12:00</div>
+                  <div class="slot-area">
+                    <div class="booking-block available-slot" onclick="Booking.selectSlot(this, '12:00', '13:00')">
+                      Click to book 12:00 – 13:00
+                    </div>
+                  </div>
+                </div>
+                <div class="timeline-row">
+                  <div class="time-marker">1:00</div>
+                  <div class="slot-area">
+                    <div class="booking-block available-slot" onclick="Booking.selectSlot(this, '13:00', '14:00')">
+                      Click to book 1:00 – 2:00
+                    </div>
+                  </div>
+                </div>
+                <div class="timeline-row">
+                  <div class="time-marker">2:00</div>
+                  <div class="slot-area">
+                    <div class="booking-block available-slot" onclick="Booking.selectSlot(this, '14:00', '15:00')">
+                      Click to book 2:00 – 3:00
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Maintenance Page -->
+          <div id="page-maintenance" class="page">
+            <div class="page-header">
+              <h2 class="page-title">Maintenance Management</h2>
+              <button class="btn btn-primary" onclick="Maintenance.openTicketModal()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                New Ticket
+              </button>
+            </div>
+
+            <div class="kanban-board" id="kanban-board">
+              <div class="kanban-col" id="col-pending" ondragover="Maintenance.allowDrop(event)" ondrop="Maintenance.drop(event, 'pending')">
+                <div class="kanban-col-header">
+                  <span class="kanban-col-title">Pending</span>
+                  <span class="kanban-count" id="count-pending">1</span>
+                </div>
+                <div class="kanban-cards" id="cards-pending">
+                  <div class="kanban-card" draggable="true" ondragstart="Maintenance.drag(event)" data-id="AF-0062">
+                    <div class="card-tag">AF-0062</div>
+                    <div class="card-title">Projector bulb not turning on</div>
+                    <div class="card-meta">Reported: Jul 5</div>
+                    <div class="card-actions">
+                      <button class="btn btn-xs btn-primary" onclick="Maintenance.approveCard(this, 'AF-0062')">Approve</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="kanban-col" id="col-approved" ondragover="Maintenance.allowDrop(event)" ondrop="Maintenance.drop(event, 'approved')">
+                <div class="kanban-col-header">
+                  <span class="kanban-col-title">Approved</span>
+                  <span class="kanban-count" id="count-approved">1</span>
+                </div>
+                <div class="kanban-cards" id="cards-approved">
+                  <div class="kanban-card" draggable="true" ondragstart="Maintenance.drag(event)" data-id="AF-003">
+                    <div class="card-tag">AF-003</div>
+                    <div class="card-title">AC Unit – noisy compressor</div>
+                    <div class="card-meta">Approved: Jul 6</div>
+                    <div class="card-actions">
+                      <button class="btn btn-xs btn-outline" onclick="Maintenance.assignTech(this)">Assign Tech</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="kanban-col" id="col-assigned" ondragover="Maintenance.allowDrop(event)" ondrop="Maintenance.drop(event, 'assigned')">
+                <div class="kanban-col-header">
+                  <span class="kanban-col-title">Technician Assigned</span>
+                  <span class="kanban-count" id="count-assigned">1</span>
+                </div>
+                <div class="kanban-cards" id="cards-assigned">
+                  <div class="kanban-card" draggable="true" ondragstart="Maintenance.drag(event)" data-id="AF-0078">
+                    <div class="card-tag">AF-0078</div>
+                    <div class="card-title">Forklift – tech: R. Varma</div>
+                    <div class="card-meta">Assigned: Jul 6</div>
+                    <div class="card-actions">
+                      <button class="btn btn-xs btn-outline" onclick="Maintenance.markInProgress(this)">Start Work</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="kanban-col" id="col-inprogress" ondragover="Maintenance.allowDrop(event)" ondrop="Maintenance.drop(event, 'inprogress')">
+                <div class="kanban-col-header">
+                  <span class="kanban-col-title">In Progress</span>
+                  <span class="kanban-count" id="count-inprogress">1</span>
+                </div>
+                <div class="kanban-cards" id="cards-inprogress">
+                  <div class="kanban-card" draggable="true" ondragstart="Maintenance.drag(event)" data-id="AF-897">
+                    <div class="card-tag">AF-897</div>
+                    <div class="card-title">Printer Jam – parts ordered</div>
+                    <div class="card-meta">In progress since: Jul 4</div>
+                    <div class="card-actions">
+                      <button class="btn btn-xs btn-primary" onclick="Maintenance.resolveCard(this)">Resolve</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="kanban-col" id="col-resolved" ondragover="Maintenance.allowDrop(event)" ondrop="Maintenance.drop(event, 'resolved')">
+                <div class="kanban-col-header">
+                  <span class="kanban-col-title">Resolved</span>
+                  <span class="kanban-count" id="count-resolved">1</span>
+                </div>
+                <div class="kanban-cards" id="cards-resolved">
+                  <div class="kanban-card card-resolved" draggable="true" ondragstart="Maintenance.drag(event)" data-id="AF-873">
+                    <div class="card-tag">AF-873</div>
+                    <div class="card-title">Chair repair – resolved 7 Jul</div>
+                    <div class="card-meta">Duration: 3 days</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p class="info-text mt-md">Approving a card moves the asset to "Under Maintenance". Resolving returns it to "Available".</p>
+          </div>
+
+          <!-- Audit Page (Screen 8) -->
+          <div id="page-audit" class="page">
+            <div class="page-header">
+              <h2 class="page-title">Asset Audit</h2>
+              <div class="page-header-actions">
+                <button class="btn btn-outline" onclick="Audit.newCycle()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  New Cycle
+                </button>
+              </div>
+            </div>
+
+            <!-- Active Audit Cycle Banner -->
+            <div class="audit-cycle-banner">
+              <div class="audit-cycle-info">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                <div>
+                  <div class="audit-cycle-title">Q3 Audit: Engineering dept – 1–15 Jul</div>
+                  <div class="audit-cycle-sub">Auditors: A. Rao, S. Iqbal</div>
+                </div>
+              </div>
+              <span class="status-badge status-active">Active</span>
+            </div>
+
+            <!-- Audit Checklist Table -->
+            <div class="table-container mt-md">
+              <table class="data-table audit-table" id="audit-checklist-table">
+                <thead>
+                  <tr>
+                    <th>Asset</th>
+                    <th>Expected location</th>
+                    <th>Verification</th>
+                  </tr>
+                </thead>
+                <tbody id="audit-checklist-body">
+                  <tr data-id="AF-003">
+                    <td>AF-003 Dell laptop</td>
+                    <td>Desk &nbsp;E12</td>
+                    <td><span class="audit-status audit-verified" onclick="Audit.cycleStatus(this)">Verified</span></td>
+                  </tr>
+                  <tr data-id="AF-9921">
+                    <td>AF-9921 Office chair</td>
+                    <td>Desk &nbsp;E14</td>
+                    <td><span class="audit-status audit-missing" onclick="Audit.cycleStatus(this)">Missing</span></td>
+                  </tr>
+                  <tr data-id="AF-9838">
+                    <td>AF-9838 Monitor</td>
+                    <td>Desk E15</td>
+                    <td><span class="audit-status audit-damaged" onclick="Audit.cycleStatus(this)">Damaged</span></td>
+                  </tr>
+                  <tr data-id="AF-0114">
+                    <td>AF-0114 Dell Laptop</td>
+                    <td>IT Store Shelf 3</td>
+                    <td><span class="audit-status audit-pending" onclick="Audit.cycleStatus(this)">Pending</span></td>
+                  </tr>
+                  <tr data-id="AF-0201">
+                    <td>AF-0201 Office Chair</td>
+                    <td>Warehouse Rack B</td>
+                    <td><span class="audit-status audit-pending" onclick="Audit.cycleStatus(this)">Pending</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="divider" style="margin:var(--gap-lg) 0"></div>
+
+            <!-- Discrepancy Banner -->
+            <div class="alert-banner alert-discrepancy" id="audit-discrepancy-banner">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span id="audit-discrepancy-text">2 assets flagged – discrepancy report generated automatically</span>
+            </div>
+
+            <div class="audit-footer-actions">
+              <button class="btn btn-outline audit-close-btn" onclick="Audit.closeCycle()">
+                Close audit cycle
+              </button>
+            </div>
+          </div>
+
+          <!-- Reports Page -->
+          <div id="page-reports" class="page">
+            <div class="page-header">
+              <h2 class="page-title">Reports & Analytics</h2>
+              <button class="btn btn-outline" onclick="Reports.exportReport()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export Report
+              </button>
+            </div>
+
+            <div class="reports-grid">
+              <div class="report-card section-card">
+                <h3 class="report-title">Asset Utilization</h3>
+                <div class="chart-area">
+                  <div class="donut-chart-container">
+                    <svg viewBox="0 0 120 120" class="donut-svg">
+                      <circle cx="60" cy="60" r="45" fill="none" stroke="var(--border)" stroke-width="18" />
+                      <circle cx="60" cy="60" r="45" fill="none" stroke="var(--accent-blue)" stroke-width="18" stroke-dasharray="179 103" stroke-dashoffset="0" stroke-linecap="butt" transform="rotate(-90 60 60)" />
+                      <circle cx="60" cy="60" r="45" fill="none" stroke="var(--accent-red)" stroke-width="18" stroke-dasharray="40 242" stroke-dashoffset="-179" stroke-linecap="butt" transform="rotate(-90 60 60)" />
+                      <circle cx="60" cy="60" r="45" fill="none" stroke="var(--accent-amber)" stroke-width="18" stroke-dasharray="63 219" stroke-dashoffset="-219" stroke-linecap="butt" transform="rotate(-90 60 60)" />
+                      <text id="report-total-assets" x="60" y="56" text-anchor="middle" fill="var(--text-primary)" font-size="14" font-weight="700">208</text>
+                      <text x="60" y="70" text-anchor="middle" fill="var(--text-muted)" font-size="8">Total Assets</text>
+                    </svg>
+                    <div class="donut-legend">
+                      <div class="legend-item"><span class="legend-dot" style="background:var(--accent-blue)"></span>Allocated (76)</div>
+                      <div class="legend-item"><span class="legend-dot" style="background:var(--accent-green)"></span>Available (128)</div>
+                      <div class="legend-item"><span class="legend-dot" style="background:var(--accent-red)"></span>Maintenance (12)</div>
+                      <div class="legend-item"><span class="legend-dot" style="background:var(--accent-amber)"></span>Retired (4)</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="report-card section-card">
+                <h3 class="report-title">Department-wise Allocation</h3>
+                <div class="dept-grid">
+                  <div class="dept-card" data-dept="Engineering">
+                    <div class="dept-header">
+                      <div class="dept-icon-wrapper" style="background: rgba(59,130,246,0.1); color: var(--accent-blue)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                      </div>
+                      <div class="dept-info">
+                        <span class="dept-name">Engineering</span>
+                        <span class="dept-count bar-value">32</span>
+                      </div>
+                    </div>
+                    <div class="dept-track">
+                      <div class="dept-fill bar-fill" style="width:65%; background: linear-gradient(90deg, var(--accent-blue), #93c5fd)"></div>
+                    </div>
+                  </div>
+                  
+                  <div class="dept-card" data-dept="IT">
+                    <div class="dept-header">
+                      <div class="dept-icon-wrapper" style="background: rgba(168,85,247,0.1); color: var(--accent-purple)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                      </div>
+                      <div class="dept-info">
+                        <span class="dept-name">IT</span>
+                        <span class="dept-count bar-value">22</span>
+                      </div>
+                    </div>
+                    <div class="dept-track">
+                      <div class="dept-fill bar-fill" style="width:45%; background: linear-gradient(90deg, var(--accent-purple), #d8b4fe)"></div>
+                    </div>
+                  </div>
+
+                  <div class="dept-card" data-dept="Facilities">
+                    <div class="dept-header">
+                      <div class="dept-icon-wrapper" style="background: rgba(20,184,166,0.1); color: var(--accent-teal)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                      </div>
+                      <div class="dept-info">
+                        <span class="dept-name">Facilities</span>
+                        <span class="dept-count bar-value">12</span>
+                      </div>
+                    </div>
+                    <div class="dept-track">
+                      <div class="dept-fill bar-fill" style="width:25%; background: linear-gradient(90deg, var(--accent-teal), #5eead4)"></div>
+                    </div>
+                  </div>
+
+                  <div class="dept-card" data-dept="Field Ops">
+                    <div class="dept-header">
+                      <div class="dept-icon-wrapper" style="background: rgba(245,158,11,0.1); color: var(--accent-amber)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                      </div>
+                      <div class="dept-info">
+                        <span class="dept-name">Field Ops</span>
+                        <span class="dept-count bar-value">10</span>
+                      </div>
+                    </div>
+                    <div class="dept-track">
+                      <div class="dept-fill bar-fill" style="width:20%; background: linear-gradient(90deg, var(--accent-amber), #fcd34d)"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="report-card section-card">
+                <h3 class="report-title">Maintenance Summary</h3>
+                <div class="metric-list">
+                  <div class="metric-row">
+                    <span class="metric-label">Avg. Resolution Time</span>
+                    <span class="metric-value accent-teal" id="m-summ-avg">2.4 days</span>
+                  </div>
+                  <div class="metric-row">
+                    <span class="metric-label">Open Tickets</span>
+                    <span class="metric-value accent-amber" id="m-summ-open">4</span>
+                  </div>
+                  <div class="metric-row">
+                    <span class="metric-label">Resolved This Month</span>
+                    <span class="metric-value accent-green" id="m-summ-resolved">11</span>
+                  </div>
+                  <div class="metric-row">
+                    <span class="metric-label">Most Maintained Asset</span>
+                    <span class="metric-value" id="m-summ-most">AF-0062</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="report-card section-card">
+                <h3 class="report-title">Booking Utilization</h3>
+                <div class="metric-list">
+                  <div class="metric-row">
+                    <span class="metric-label">Conference Room B2</span>
+                    <span class="metric-value accent-blue" id="b-util-b2">78%</span>
+                  </div>
+                  <div class="metric-row">
+                    <span class="metric-label">Lab A</span>
+                    <span class="metric-value accent-purple" id="b-util-lab">55%</span>
+                  </div>
+                  <div class="metric-row">
+                    <span class="metric-label">Projector AF-0062</span>
+                    <span class="metric-value accent-teal" id="b-util-proj">40%</span>
+                  </div>
+                  <div class="metric-row">
+                    <span class="metric-label">Peak Hour</span>
+                    <span class="metric-value" id="b-util-peak">10:00 – 12:00</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notifications Page (Screen 10) -->
+          <div id="page-notifications" class="page">
+            <div class="page-header">
+              <h2 class="page-title">Activity Logs &amp; Notifications</h2>
+              <button class="btn btn-outline" onclick="Notifications.markAllRead()">Mark all as read</button>
+            </div>
+
+            <!-- Filter Tabs -->
+            <div class="notif-tabs">
+              <button class="notif-tab active" id="ntab-all"       onclick="Notifications.filterTab('all', this)">All</button>
+              <button class="notif-tab"        id="ntab-alerts"    onclick="Notifications.filterTab('alerts', this)">Alerts</button>
+              <button class="notif-tab"        id="ntab-approvals" onclick="Notifications.filterTab('approvals', this)">Approvals</button>
+              <button class="notif-tab"        id="ntab-bookings"  onclick="Notifications.filterTab('bookings', this)">Bookings</button>
+            </div>
+
+            <!-- Activity Log List -->
+            <div class="activity-log-list" id="activity-log-list">
+              <div class="activity-log-row" data-type="all" id="alog-1">
+                <span class="alog-square alog-sq-blue"></span>
+                <span class="alog-text">Laptop <strong>AF-0014</strong> assigned to Priya Shah</span>
+                <span class="alog-time">2m ago</span>
+              </div>
+              <div class="activity-log-row" data-type="approvals" id="alog-2">
+                <span class="alog-square alog-sq-green"></span>
+                <span class="alog-text">Maintenance request <strong>AF-0055</strong> approved</span>
+                <span class="alog-time">18m ago</span>
+              </div>
+              <div class="activity-log-row" data-type="bookings" id="alog-3">
+                <span class="alog-square alog-sq-blue"></span>
+                <span class="alog-text">Booking confirmed : Room B2 : 2:00 to 3:00 PM</span>
+                <span class="alog-time">1h ago</span>
+              </div>
+              <div class="activity-log-row" data-type="approvals" id="alog-4">
+                <span class="alog-square alog-sq-amber"></span>
+                <span class="alog-text">Transfer approved : <strong>AF-0033</strong> to facilities dept</span>
+                <span class="alog-time">3h ago</span>
+              </div>
+              <div class="activity-log-row" data-type="alerts" id="alog-5">
+                <span class="alog-square alog-sq-red"></span>
+                <span class="alog-text">Overdue return : <strong>AF-0021</strong> was due 3 days ago</span>
+                <span class="alog-time">1d ago</span>
+              </div>
+              <div class="activity-log-row" data-type="alerts" id="alog-6">
+                <span class="alog-square alog-sq-amber"></span>
+                <span class="alog-text">audit discrepancy flagged : <strong>AF-0088</strong> damaged</span>
+                <span class="alog-time">2d ago</span>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Overlay -->
+  <div id="modal-overlay" class="modal-overlay" onclick="Modal.close()">
+    <div class="modal" onclick="event.stopPropagation()" id="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-title">Modal</h3>
+        <button class="modal-close" onclick="Modal.close()">×</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
